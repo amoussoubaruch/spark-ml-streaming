@@ -29,7 +29,7 @@ object KMeans {
     val (inputDir, outputDir, batchDuration, numClusters, numDimensions, halfLife, timeUnit) =
       (args(0), args(1), args(2).toLong, args(3).toInt, args(4).toInt, args(5).toFloat, args(6))
 
-    val conf = new SparkConf().setMaster("local").setAppName("KMeansDemo")
+    val conf = new SparkConf().setIfMissing("spark.master", "local").setAppName("StreamingKMeansSample")
     val ssc = new StreamingContext(conf, Seconds(batchDuration))
 
     val trainingData = ssc.textFileStream(inputDir).map(Vectors.parse)
