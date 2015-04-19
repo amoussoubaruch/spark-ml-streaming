@@ -5,7 +5,7 @@ from numpy import loadtxt
 
 
 def findspark():
-  
+
     sparkhome = os.getenv("SPARK_HOME")
     if sparkhome is None:
         raise Exception("The environment variable SPARK_HOME must be set to the Spark installation directory")
@@ -14,7 +14,7 @@ def findspark():
 
 
 def findjar():
-  
+
     calldir = os.path.dirname(os.path.realpath(__file__))
     jardir = os.path.join(calldir, 'lib', '*.jar')
     jar = glob.glob(jardir)

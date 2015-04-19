@@ -78,43 +78,49 @@ class StreamingKMeans(StreamingDemo):
             npoints = self.npoints
             pts, labels = make_blobs(npoints, self.ndims, centers, cluster_std=self.std)
             self.writepoints(pts, i)
+            self.writecenters(labels, i)
             time.sleep(1)
 
-            # get the latest model (after waiting)
-            model, modeltime = loadrecent(self.dataout + '/*-model.txt', modeltime, model)
+            # To run the Lightning client separately (ie. lgn is None)
+            # There are a few differences in the code below for instance to retrieve
+            # centers and points written out above.
+            # Please refer to the code in the IPython notebook for specifics.
+            if (lgn is not None):
+                # get the latest model (after waiting)
+                model, modeltime = loadrecent(self.dataout + '/*-model.txt', modeltime, model)
 
-            # plot an update (if we got a valid model)
-            if len(model) == self.ncenters:
+                # plot an update (if we got a valid model)
+                if (len(model) == self.ncenters):
 
-                clrs = labels
-                order = argsort(labels)
-                clrs = clrs[order]
-                pts = pts[order]
-                s = ones(self.npoints) * 10
+                    clrs = labels
+                    order = argsort(labels)
+                    clrs = clrs[order]
+                    pts = pts[order]
+                    s = ones(self.npoints) * 10
 
-                if self.ndims == 1:
-                    pts = vstack((pts, model[:,None]))
-                else:
-                    pts = vstack((pts, model))
-                clrs = hstack((clrs, ones(self.ncenters) * 5))
-                s = hstack((s, ones(self.ncenters) * 10))
-
-                # wait a few iterations before plotting
-                if (lgn is not None) & (i > 5):
-
-                    # scatter plot for two dimensions
-                    if self.ndims == 2:
-                        if viz is None:
-                            viz = lgn.scatterstreaming(pts[:, 0], pts[:, 1], label=clrs, size=s)
-                        else:
-                            viz.append(pts[:, 0], pts[:, 1], label=clrs, size=s)
-
-                    # line plot for one dimension
-                    elif self.ndims == 1:
-                        if viz is None:
-                            viz = lgn.linestreaming(pts, label=clrs, size=s/2)
-                        else:
-                            viz.append(pts, label=clrs, size=s/2)
-
+                    if self.ndims == 1:
+                        pts = vstack((pts, model[:,None]))
                     else:
-                        raise Exception('Plotting only supported with 1 or 2 dimensions')
+                        pts = vstack((pts, model))
+                    clrs = hstack((clrs, ones(self.ncenters) * 5))
+                    s = hstack((s, ones(self.ncenters) * 10))
+
+                    # wait a few iterations before plotting
+                    if (i > 5):
+
+                        # scatter plot for two dimensions
+                        if self.ndims == 2:
+                            if viz is None:
+                                viz = lgn.scatterstreaming(pts[:, 0], pts[:, 1], label=clrs, size=s)
+                            else:
+                                viz.append(pts[:, 0], pts[:, 1], label=clrs, size=s)
+
+                        # line plot for one dimension
+                        elif self.ndims == 1:
+                            if viz is None:
+                                viz = lgn.linestreaming(pts, label=clrs, size=s/2)
+                            else:
+                                viz.append(pts, label=clrs, size=s/2)
+
+                        else:
+                            raise Exception('Plotting only supported with 1 or 2 dimensions')
